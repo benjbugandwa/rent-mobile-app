@@ -22,6 +22,7 @@ export default function RootLayout() {
         <Stack.Screen name="item/[id]" options={{ title: 'Détails', headerBackTitle: 'Retour' }} />
         <Stack.Screen name="auth" options={{ title: 'Connexion', presentation: 'modal' }} />
         <Stack.Screen name="publish" options={{ title: 'Nouvelle Annonce', presentation: 'modal' }} />
+        <Stack.Screen name="my-items" options={{ title: 'Mes Annonces', headerBackTitle: 'Retour' }} />
       </Stack>
       <StatusBar style="dark" />
     </>

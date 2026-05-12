@@ -44,8 +44,25 @@ export const HomeScreen = () => {
     <View style={styles.container}>
       {/* Header Area for Filters (To be expanded later) */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Découvrez nos offres</Text>
-        <Text style={styles.headerSubtitle}>Véhicules et maisons à louer</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.headerTitle}>Découvrez nos offres</Text>
+            <Text style={styles.headerSubtitle}>Véhicules et maisons à louer</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.profileBtn}
+            onPress={async () => {
+              const token = await AsyncStorage.getItem('userToken');
+              if (token) {
+                router.push('/my-items');
+              } else {
+                router.push('/auth');
+              }
+            }}
+          >
+            <Text style={styles.profileBtnText}>Mes offres</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Publish Floating Button */}
@@ -99,10 +116,15 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: theme.spacing.m,
-    paddingTop: theme.spacing.xl,
+    paddingTop: theme.spacing.xl + 10,
     backgroundColor: theme.colors.surface,
     ...theme.shadows.soft,
     zIndex: 10,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 24,
@@ -113,6 +135,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: theme.colors.textMuted,
     marginTop: 4,
+  },
+  profileBtn: {
+    backgroundColor: '#DBEAFE',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: theme.borderRadius.s,
+  },
+  profileBtnText: {
+    color: '#1D4ED8',
+    fontWeight: '600',
+    fontSize: 13,
   },
   list: {
     padding: theme.spacing.m,

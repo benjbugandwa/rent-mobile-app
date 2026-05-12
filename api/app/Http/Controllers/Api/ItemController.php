@@ -36,6 +36,18 @@ class ItemController extends Controller
     }
 
     /**
+     * Get items belonging to the authenticated provider
+     */
+    public function myItems(Request $request)
+    {
+        $items = Item::where('user_id', $request->user()->id)
+                     ->latest()
+                     ->get();
+
+        return response()->json(['items' => $items]);
+    }
+
+    /**
      * Store a newly created item in storage.
      */
     public function store(Request $request)

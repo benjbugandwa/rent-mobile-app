@@ -18,6 +18,7 @@ Route::get('/items/{id}', [ItemController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/profile', [AuthController::class, 'profile']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::get('/profile/items', [ItemController::class, 'myItems']);
     
     Route::post('/items', [ItemController::class, 'store']);
     Route::put('/items/{id}', [ItemController::class, 'update']);
