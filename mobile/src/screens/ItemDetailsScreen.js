@@ -31,7 +31,6 @@ export const ItemDetailsScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Amazon-style Carousel */}
         <ScrollView 
           horizontal 
           pagingEnabled 
@@ -57,9 +56,11 @@ export const ItemDetailsScreen = () => {
           </View>
 
           <Text style={styles.statusText}>
-            Status: <Text style={{ color: item.status ? theme.colors.success : theme.colors.error }}>
-              {item.status ? 'Disponible' : 'Indisponible'}
-            </Text>
+            Status: {item.status ? (
+              <Text style={{ color: theme.colors.success }}>Disponible</Text>
+            ) : (
+              <Text style={{ color: theme.colors.error }}>Indisponible</Text>
+            )}
           </Text>
 
           <View style={styles.section}>
@@ -70,25 +71,24 @@ export const ItemDetailsScreen = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Caractéristiques</Text>
             {isVehicle ? (
-              <>
+              <View>
                 <Text style={styles.detailText}>• Marque : {item.brand}</Text>
                 <Text style={styles.detailText}>• Modèle : {item.model}</Text>
-              </>
+              </View>
             ) : (
-              <>
+              <View>
                 <Text style={styles.detailText}>• Quartier : {item.neighborhood}</Text>
                 <Text style={styles.detailText}>• Chambres : {item.bedrooms}</Text>
                 <Text style={styles.detailText}>• Eau : {item.has_water ? 'Oui' : 'Non'}</Text>
                 <Text style={styles.detailText}>• Électricité : {item.has_electricity ? 'Oui' : 'Non'}</Text>
-              </>
+              </View>
             )}
           </View>
           
-          <View style={{ height: 100 }} /> {/* Padding for bottom button */}
+          <View style={{ height: 100 }} />
         </View>
       </ScrollView>
 
-      {/* Sticky Bottom Bar */}
       <View style={styles.bottomBar}>
         <Button 
           title="Contacter le fournisseur via WhatsApp" 
