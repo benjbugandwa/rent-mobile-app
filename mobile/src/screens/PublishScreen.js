@@ -6,6 +6,7 @@ import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { theme } from '../config/theme';
 import { api } from '../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const PublishScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -76,18 +77,31 @@ export const PublishScreen = () => {
     }
 
     try {
-      await api.post('/items', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const token = await AsyncStorage.getItem('userToken');
+      const response = await fetch(`${api.defaults.baseURL}/items`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+        body: formData,
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw { response: { data: errorData } };
+      }
+
       setSuccess(true);
       setTimeout(() => {
         router.replace('/');
       }, 2000);
     } catch (err) {
-      if (err.response && err.response.data.errors) {
+      console.log('Upload error:', err);
+      if (err.response && err.response.data && err.response.data.errors) {
         setErrors(err.response.data.errors);
       } else {
-        setErrors({ general: "Échec de la publication de l'annonce." });
+        setErrors({ general: "Échec de la publication de l'annonce. Vérifiez les photos et la connexion." });
       }
     } finally {
       setLoading(false);

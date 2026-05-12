@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // L'IP 192.168.0.252 correspond à votre adresse IPv4 locale sur le réseau Wi-Fi
-const API_URL = 'http://192.168.0.252:8000/api'; 
+const API_URL = 'http://192.168.0.102:8000/api'; 
 
 export const api = axios.create({
   baseURL: API_URL,
