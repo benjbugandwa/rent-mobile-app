@@ -21,7 +21,7 @@ export const PublishScreen = () => {
 
   const pickImage = async (setter) => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       quality: 0.7,
     });
@@ -99,7 +99,12 @@ export const PublishScreen = () => {
     } catch (err) {
       console.log('Upload error:', err);
       if (err.response && err.response.data && err.response.data.errors) {
-        setErrors(err.response.data.errors);
+        const errorKeys = Object.keys(err.response.data.errors);
+        const errorValues = Object.values(err.response.data.errors).flat().join('\n');
+        setErrors({ 
+          ...err.response.data.errors, 
+          general: "Erreurs:\n" + errorValues 
+        });
       } else {
         setErrors({ general: "Échec de la publication de l'annonce. Vérifiez les photos et la connexion." });
       }
