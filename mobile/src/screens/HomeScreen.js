@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Text, RefreshControl, TouchableOpacity, TextInput } from 'react-native';
+import { View, FlatList, StyleSheet, Text, RefreshControl, TouchableOpacity, TextInput, Image } from 'react-native';
 import { api } from '../services/api';
 import { ItemCard } from '../components/ItemCard';
 import { Loader } from '../components/Loader';
@@ -51,9 +51,15 @@ export const HomeScreen = () => {
       {/* Header Area for Filters (To be expanded later) */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View>
-            <Text style={styles.headerTitle}>Découvrez nos offres</Text>
-            <Text style={styles.headerSubtitle}>Véhicules et maisons à louer</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Image 
+              source={require('../../assets/images/rent-mobile-logo-removebg-preview.png')} 
+              style={{ width: 45, height: 45, marginRight: 12, resizeMode: 'contain' }} 
+            />
+            <View>
+              <Text style={styles.headerTitle}>Rent Mobile</Text>
+              <Text style={styles.headerSubtitle}>Véhicules & Maisons</Text>
+            </View>
           </View>
           <TouchableOpacity 
             style={styles.profileBtn}
