@@ -171,12 +171,12 @@ export const AuthScreen = () => {
             </View>
 
             <Input
-              label="Numéro WhatsApp"
+              label="Numéro WhatsApp (Format International)"
               placeholder="Ex: +243810000000"
               keyboardType="phone-pad"
-              hint="Doit inclure l'indicatif du pays"
+              hint="Indispensable : Commencez par '+' suivi de l'indicatif pays"
               value={extraInfo.whatsapp_number}
-              onChangeText={(txt) => setExtraInfo({...extraInfo, whatsapp_number: txt})}
+              onChangeText={(txt) => setExtraInfo({...extraInfo, whatsapp_number: txt.replace(/\s/g, '')})}
               error={errors.whatsapp_number && errors.whatsapp_number[0]}
             />
 

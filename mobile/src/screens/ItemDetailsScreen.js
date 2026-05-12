@@ -63,6 +63,17 @@ export const ItemDetailsScreen = () => {
             )}
           </Text>
 
+          <View style={styles.contactContainer}>
+            <Button 
+              title="Contacter le fournisseur via WhatsApp" 
+              onPress={handleContact}
+              disabled={!item.user || !item.user.whatsapp_number}
+            />
+            {(!item.user || !item.user.whatsapp_number) && (
+              <Text style={styles.errorHint}>Numéro WhatsApp indisponible</Text>
+            )}
+          </View>
+
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Description</Text>
             <Text style={styles.description}>{item.description || "Aucune description fournie."}</Text>
@@ -85,20 +96,9 @@ export const ItemDetailsScreen = () => {
             )}
           </View>
           
-          <View style={{ height: 100 }} />
+          <View style={{ height: 40 }} />
         </View>
       </ScrollView>
-
-      <View style={styles.bottomBar}>
-        <Button 
-          title="Contacter le fournisseur via WhatsApp" 
-          onPress={handleContact}
-          disabled={!item.user || !item.user.whatsapp_number}
-        />
-        {(!item.user || !item.user.whatsapp_number) && (
-          <Text style={styles.errorHint}>Numéro WhatsApp indisponible</Text>
-        )}
-      </View>
     </View>
   );
 };
@@ -151,6 +151,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: theme.colors.text,
+    marginBottom: theme.spacing.m,
+  },
+  contactContainer: {
     marginBottom: theme.spacing.l,
   },
   section: {
@@ -175,17 +178,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.colors.surface,
-    padding: theme.spacing.m,
-    paddingBottom: theme.spacing.xl, // for safe area on iOS
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
   },
   errorHint: {
     textAlign: 'center',

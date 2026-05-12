@@ -48,7 +48,9 @@ class AuthController extends Controller
         $extraValidator = Validator::make($request->all(), [
             'province' => 'required|string',
             'city' => 'required|string',
-            'whatsapp_number' => 'required|string',
+            'whatsapp_number' => ['required', 'string', 'regex:/^\+[1-9]\d{9,14}$/'],
+        ], [
+            'whatsapp_number.regex' => "Le numéro WhatsApp doit commencer par un '+' suivi du code pays et du numéro, sans espaces (ex: +243810000000)."
         ]);
 
         if ($extraValidator->fails()) {
