@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Remplacer par l'IP de votre machine locale (ex: 192.168.1.x au lieu de localhost pour mobile)
-const API_URL = 'http://10.0.2.2:8000/api'; 
+// L'IP 192.168.0.252 correspond à votre adresse IPv4 locale sur le réseau Wi-Fi
+const API_URL = 'http://192.168.0.252:8000/api'; 
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -14,9 +14,13 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem('userToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {
+      console.log('AsyncStorage Error:', e);
     }
     return config;
   },

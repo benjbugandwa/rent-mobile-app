@@ -64,10 +64,14 @@ export const HomeScreen = () => {
           <TouchableOpacity 
             style={styles.profileBtn}
             onPress={async () => {
-              const token = await AsyncStorage.getItem('userToken');
-              if (token) {
-                router.push('/my-items');
-              } else {
+              try {
+                const token = await AsyncStorage.getItem('userToken');
+                if (token) {
+                  router.push('/my-items');
+                } else {
+                  router.push('/auth');
+                }
+              } catch (e) {
                 router.push('/auth');
               }
             }}
@@ -114,10 +118,14 @@ export const HomeScreen = () => {
       <TouchableOpacity 
         style={styles.fab} 
         onPress={async () => {
-          const token = await AsyncStorage.getItem('userToken');
-          if (token) {
-            router.push('/publish');
-          } else {
+          try {
+            const token = await AsyncStorage.getItem('userToken');
+            if (token) {
+              router.push('/publish');
+            } else {
+              router.push('/auth');
+            }
+          } catch (e) {
             router.push('/auth');
           }
         }}
