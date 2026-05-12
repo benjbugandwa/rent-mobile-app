@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Text, RefreshControl } from 'react-native';
+import { View, FlatList, StyleSheet, Text, RefreshControl, TouchableOpacity, TextInput } from 'react-native';
 import { api } from '../services/api';
 import { ItemCard } from '../components/ItemCard';
 import { Loader } from '../components/Loader';
@@ -13,12 +13,18 @@ export const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState('all');
 
   const fetchItems = async () => {
     try {
       setError(null);
-      const response = await api.get('/items');
-      setItems(response.data.data || []); // Laravel paginate puts data in .data
+      setLoading(true);
+      const response = await api.get('/items', { 
+        params: { search: searchQuery, type: filterType } 
+      });
+      setItems(response.data.data || []);
     } catch (err) {
       setError('Impossible de charger les annonces. Veuillez vérifier votre connexion.');
     } finally {
@@ -29,7 +35,7 @@ export const HomeScreen = () => {
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [filterType]); // Refetch when type changes
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -61,6 +67,39 @@ export const HomeScreen = () => {
             }}
           >
             <Text style={styles.profileBtnText}>Mes offres</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher (ex: Toyota, Gombe...)"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onSubmitEditing={fetchItems}
+            returnKeyType="search"
+            placeholderTextColor={theme.colors.textMuted}
+          />
+        </View>
+
+        <View style={styles.filterTabs}>
+          <TouchableOpacity 
+            style={[styles.tab, filterType === 'all' && styles.activeTab]}
+            onPress={() => setFilterType('all')}
+          >
+            <Text style={[styles.tabText, filterType === 'all' && styles.activeTabText]}>Tout</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, filterType === 'vehicle' && styles.activeTab]}
+            onPress={() => setFilterType('vehicle')}
+          >
+            <Text style={[styles.tabText, filterType === 'vehicle' && styles.activeTabText]}>Véhicules</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, filterType === 'house' && styles.activeTab]}
+            onPress={() => setFilterType('house')}
+          >
+            <Text style={[styles.tabText, filterType === 'house' && styles.activeTabText]}>Maisons</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -177,9 +216,38 @@ const styles = StyleSheet.create({
     ...theme.shadows.medium,
     zIndex: 100,
   },
-  fabText: {
+  searchContainer: {
+    marginTop: theme.spacing.m,
+  },
+  searchInput: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.borderRadius.m,
+    paddingHorizontal: theme.spacing.m,
+    height: 44,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    color: theme.colors.text,
+  },
+  filterTabs: {
+    flexDirection: 'row',
+    marginTop: theme.spacing.m,
+  },
+  tab: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: theme.borderRadius.s,
+    marginRight: theme.spacing.s,
+    backgroundColor: theme.colors.background,
+  },
+  activeTab: {
+    backgroundColor: theme.colors.primary,
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.textMuted,
+  },
+  activeTabText: {
     color: theme.colors.surface,
-    fontSize: 16,
-    fontWeight: '700',
   }
 });

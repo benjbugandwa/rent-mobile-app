@@ -16,18 +16,20 @@ class ItemController extends Controller
     {
         $query = Item::with('user:id,name,whatsapp_number,province,city,avatar')
                      ->where('status', true)
+                     ->where('is_deleted', false)
                      ->latest();
 
-        if ($request->has('type')) {
+        if ($request->has('type') && $request->type !== 'all') {
             $query->where('type', $request->type);
         }
         
-        if ($request->has('brand')) {
-            $query->where('brand', 'ilike', '%' . $request->brand . '%');
-        }
-
-        if ($request->has('model')) {
-            $query->where('model', 'ilike', '%' . $request->model . '%');
+        if ($request->has('search')) {
+            $search = '%' . $request->search . '%';
+            $query->where(function($q) use ($search) {
+                $q->where('brand', 'ilike', $search)
+                  ->orWhere('model', 'ilike', $search)
+                  ->orWhere('neighborhood', 'ilike', $search);
+            });
         }
 
         $items = $query->paginate(10);
@@ -41,6 +43,7 @@ class ItemController extends Controller
     public function myItems(Request $request)
     {
         $items = Item::where('user_id', $request->user()->id)
+                     ->where('is_deleted', false)
                      ->latest()
                      ->get();
 
@@ -149,7 +152,7 @@ class ItemController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $item->delete();
+        $item->update(['is_deleted' => true, 'status' => false]);
 
         return response()->json(['message' => 'Item deleted successfully']);
     }

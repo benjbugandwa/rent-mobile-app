@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Switch, Alert, Image, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Switch, Alert, Image, RefreshControl, TouchableOpacity } from 'react-native';
 import { api } from '../services/api';
 import { theme } from '../config/theme';
 import { Loader } from '../components/Loader';
@@ -45,6 +45,26 @@ export const MyItemsScreen = () => {
     }
   };
 
+  const confirmDelete = (item) => {
+    Alert.alert(
+      'Supprimer l\'annonce',
+      'Êtes-vous sûr de vouloir supprimer cette annonce ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Supprimer', style: 'destructive', onPress: () => deleteItem(item) }
+      ]
+    );
+  };
+
+  const deleteItem = async (item) => {
+    try {
+      await api.delete(`/items/${item.id}`);
+      setItems(items.filter(i => i.id !== item.id));
+    } catch (err) {
+      Alert.alert('Erreur', 'Impossible de supprimer l\'annonce.');
+    }
+  };
+
   const renderItem = ({ item }) => {
     const isVehicle = item.type === 'vehicle';
     const title = isVehicle ? `${item.brand} ${item.model}` : `Maison - ${item.neighborhood}`;
@@ -54,7 +74,12 @@ export const MyItemsScreen = () => {
       <View style={styles.card}>
         <Image source={{ uri: imageUrl }} style={styles.image} />
         <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={1}>{title}</Text>
+          <View style={styles.headerRow}>
+            <Text style={styles.title} numberOfLines={1}>{title}</Text>
+            <TouchableOpacity onPress={() => confirmDelete(item)} style={styles.deleteBtn}>
+              <Text style={styles.deleteBtnText}>🗑️</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.subtitle}>{isVehicle ? 'Véhicule' : 'Maison'}</Text>
 
           <View style={styles.actionRow}>
@@ -122,10 +147,22 @@ const styles = StyleSheet.create({
     padding: theme.spacing.m,
     justifyContent: 'center',
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 16,
     fontWeight: '700',
     color: theme.colors.text,
+    flex: 1,
+  },
+  deleteBtn: {
+    padding: 4,
+  },
+  deleteBtnText: {
+    fontSize: 16,
   },
   subtitle: {
     fontSize: 13,
