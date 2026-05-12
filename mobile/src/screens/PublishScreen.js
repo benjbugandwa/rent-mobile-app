@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
@@ -14,8 +15,20 @@ export const PublishScreen = () => {
 
   // Common Fields
   const [description, setDescription] = useState('');
-  const [exteriorPhoto, setExteriorPhoto] = useState('');
-  const [interiorPhoto, setInteriorPhoto] = useState('');
+  const [exteriorPhoto, setExteriorPhoto] = useState(null);
+  const [interiorPhoto, setInteriorPhoto] = useState(null);
+
+  const pickImage = async (setter) => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setter(result.assets[0]);
+    }
+  };
 
   // Vehicle Fields
   const [brand, setBrand] = useState('');
@@ -31,22 +44,41 @@ export const PublishScreen = () => {
     setLoading(true);
     setErrors({});
     
-    let payload = {
-      type,
-      description,
-      exterior_photo: exteriorPhoto,
-      interior_photo: interiorPhoto,
-      status: true,
-    };
+    const formData = new FormData();
+    formData.append('type', type);
+    formData.append('description', description);
+    formData.append('status', 'true');
+    
+    if (exteriorPhoto) {
+      formData.append('exterior_photo', {
+        uri: exteriorPhoto.uri,
+        name: 'exterior.jpg',
+        type: 'image/jpeg',
+      });
+    }
+
+    if (interiorPhoto) {
+      formData.append('interior_photo', {
+        uri: interiorPhoto.uri,
+        name: 'interior.jpg',
+        type: 'image/jpeg',
+      });
+    }
 
     if (type === 'vehicle') {
-      payload = { ...payload, brand, model };
+      formData.append('brand', brand);
+      formData.append('model', model);
     } else {
-      payload = { ...payload, neighborhood, bedrooms: parseInt(bedrooms), has_water: hasWater, has_electricity: hasElectricity };
+      formData.append('neighborhood', neighborhood);
+      formData.append('bedrooms', bedrooms);
+      formData.append('has_water', hasWater ? 'true' : 'false');
+      formData.append('has_electricity', hasElectricity ? 'true' : 'false');
     }
 
     try {
-      await api.post('/items', payload);
+      await api.post('/items', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setSuccess(true);
       setTimeout(() => {
         router.replace('/');
@@ -118,8 +150,30 @@ export const PublishScreen = () => {
 
       {/* Common Fields */}
       <Input label="Description (Obligatoire)" placeholder="Détails du bien..." multiline numberOfLines={4} style={{ height: 100, textAlignVertical: 'top' }} value={description} onChangeText={setDescription} error={errors.description && errors.description[0]} />
-      <Input label="Photo Extérieure (URL)" placeholder="https://..." hint="Lien vers l'image" value={exteriorPhoto} onChangeText={setExteriorPhoto} error={errors.exterior_photo && errors.exterior_photo[0]} />
-      <Input label="Photo Intérieure (URL)" placeholder="https://..." hint="Lien vers l'image" value={interiorPhoto} onChangeText={setInteriorPhoto} error={errors.interior_photo && errors.interior_photo[0]} />
+      
+      <View style={styles.imagePickerContainer}>
+        <Text style={styles.imagePickerLabel}>Photo Extérieure</Text>
+        <TouchableOpacity style={styles.imagePickerBtn} onPress={() => pickImage(setExteriorPhoto)}>
+          {exteriorPhoto ? (
+            <Image source={{ uri: exteriorPhoto.uri }} style={styles.imagePreview} />
+          ) : (
+            <Text style={styles.imagePickerText}>📷 Sélectionner une photo</Text>
+          )}
+        </TouchableOpacity>
+        {errors.exterior_photo && <Text style={styles.errorText}>{errors.exterior_photo[0]}</Text>}
+      </View>
+
+      <View style={styles.imagePickerContainer}>
+        <Text style={styles.imagePickerLabel}>Photo Intérieure</Text>
+        <TouchableOpacity style={styles.imagePickerBtn} onPress={() => pickImage(setInteriorPhoto)}>
+          {interiorPhoto ? (
+            <Image source={{ uri: interiorPhoto.uri }} style={styles.imagePreview} />
+          ) : (
+            <Text style={styles.imagePickerText}>📷 Sélectionner une photo</Text>
+          )}
+        </TouchableOpacity>
+        {errors.interior_photo && <Text style={styles.errorText}>{errors.interior_photo[0]}</Text>}
+      </View>
 
       <Button 
         title="Publier l'offre" 
@@ -211,5 +265,38 @@ const styles = StyleSheet.create({
   successSub: {
     fontSize: 16,
     color: theme.colors.textMuted,
+  },
+  imagePickerContainer: {
+    marginBottom: theme.spacing.m,
+  },
+  imagePickerLabel: {
+    fontSize: 14,
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+    fontWeight: '500',
+  },
+  imagePickerBtn: {
+    backgroundColor: theme.colors.background,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.m,
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  imagePickerText: {
+    color: theme.colors.textMuted,
+    fontSize: 14,
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  errorText: {
+    color: theme.colors.error,
+    fontSize: 12,
+    marginTop: 4,
   }
 });

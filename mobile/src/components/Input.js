@@ -40,8 +40,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     paddingHorizontal: theme.spacing.m,
-    height: 52,
+    minHeight: 52,
     justifyContent: 'center',
+    paddingVertical: 4,
   },
   inputError: {
     borderColor: theme.colors.error,

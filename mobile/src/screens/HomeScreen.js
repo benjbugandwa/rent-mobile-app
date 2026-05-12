@@ -112,26 +112,26 @@ export const HomeScreen = () => {
             <Text style={[styles.tabText, filterType === 'house' && styles.activeTabText]}>Maisons</Text>
           </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Publish Floating Button */}
-      <TouchableOpacity 
-        style={styles.fab} 
-        onPress={async () => {
-          try {
-            const token = await AsyncStorage.getItem('userToken');
-            if (token) {
-              router.push('/publish');
-            } else {
+        {/* Publish Button properly visible */}
+        <TouchableOpacity 
+          style={styles.publishBtn} 
+          onPress={async () => {
+            try {
+              const token = await AsyncStorage.getItem('userToken');
+              if (token) {
+                router.push('/publish');
+              } else {
+                router.push('/auth');
+              }
+            } catch (e) {
               router.push('/auth');
             }
-          } catch (e) {
-            router.push('/auth');
-          }
-        }}
-      >
-        <Text style={styles.fabText}>+ Publier</Text>
-      </TouchableOpacity>
+          }}
+        >
+          <Text style={styles.publishBtnText}>+ Publier une annonce</Text>
+        </TouchableOpacity>
+      </View>
 
       {error ? (
         <View style={styles.centerContainer}>
@@ -219,16 +219,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
   },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 20,
+  publishBtn: {
+    backgroundColor: '#000000',
+    marginTop: theme.spacing.m,
     paddingVertical: 14,
-    borderRadius: 30,
+    borderRadius: theme.borderRadius.m,
+    alignItems: 'center',
     ...theme.shadows.medium,
-    zIndex: 100,
+  },
+  publishBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   searchContainer: {
     marginTop: theme.spacing.m,

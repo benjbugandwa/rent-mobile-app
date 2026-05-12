@@ -59,8 +59,8 @@ class ItemController extends Controller
             'type' => 'required|in:vehicle,house',
             'description' => 'required|string',
             'status' => 'boolean',
-            'interior_photo' => 'nullable|url',
-            'exterior_photo' => 'nullable|url',
+            'interior_photo' => 'nullable|image|max:5120', // Max 5MB
+            'exterior_photo' => 'nullable|image|max:5120',
         ];
 
         if ($request->type === 'vehicle') {
@@ -79,8 +79,24 @@ class ItemController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $itemData = $request->only(array_keys($rules));
+        $itemData = $request->except(['exterior_photo', 'interior_photo']);
         $itemData['user_id'] = $request->user()->id;
+
+        // Handle File Uploads
+        if ($request->hasFile('exterior_photo')) {
+            $path = $request->file('exterior_photo')->store('items', 'public');
+            $itemData['exterior_photo'] = url('storage/' . $path);
+        }
+
+        if ($request->hasFile('interior_photo')) {
+            $path = $request->file('interior_photo')->store('items', 'public');
+            $itemData['interior_photo'] = url('storage/' . $path);
+        }
+
+        // Handle boolean conversions from FormData (FormData sends strings 'true'/'false' or '1'/'0')
+        if (isset($itemData['status'])) $itemData['status'] = filter_var($itemData['status'], FILTER_VALIDATE_BOOLEAN);
+        if (isset($itemData['has_water'])) $itemData['has_water'] = filter_var($itemData['has_water'], FILTER_VALIDATE_BOOLEAN);
+        if (isset($itemData['has_electricity'])) $itemData['has_electricity'] = filter_var($itemData['has_electricity'], FILTER_VALIDATE_BOOLEAN);
 
         $item = Item::create($itemData);
 
