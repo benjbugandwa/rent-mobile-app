@@ -48,21 +48,21 @@ export const PublishScreen = () => {
     const formData = new FormData();
     formData.append('type', type);
     formData.append('description', description);
-    formData.append('status', 'true');
+    formData.append('status', '1'); // Laravel accepts '1'/'0' for booleans, not 'true'/'false'
     
     if (exteriorPhoto) {
       formData.append('exterior_photo', {
         uri: exteriorPhoto.uri,
-        name: 'exterior.jpg',
-        type: 'image/jpeg',
+        name: exteriorPhoto.fileName || 'exterior.jpg',
+        type: exteriorPhoto.mimeType || 'image/jpeg',
       });
     }
 
     if (interiorPhoto) {
       formData.append('interior_photo', {
         uri: interiorPhoto.uri,
-        name: 'interior.jpg',
-        type: 'image/jpeg',
+        name: interiorPhoto.fileName || 'interior.jpg',
+        type: interiorPhoto.mimeType || 'image/jpeg',
       });
     }
 
@@ -72,8 +72,8 @@ export const PublishScreen = () => {
     } else {
       formData.append('neighborhood', neighborhood);
       formData.append('bedrooms', bedrooms);
-      formData.append('has_water', hasWater ? 'true' : 'false');
-      formData.append('has_electricity', hasElectricity ? 'true' : 'false');
+      formData.append('has_water', hasWater ? '1' : '0');
+      formData.append('has_electricity', hasElectricity ? '1' : '0');
     }
 
     try {
